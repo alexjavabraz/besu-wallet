@@ -17,6 +17,10 @@
     {{ savingRpc() ? 'Testando...' : 'Salvar e testar →' }}
   </button>
 
+  @if (rpcSaveError()) {
+    <p class="error-text">{{ rpcSaveError() }}</p>
+  }
+
   <div class="status">
     @switch (networkService.status()) {
       @case ('ok') {

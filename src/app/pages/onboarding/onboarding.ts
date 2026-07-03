@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { copyText } from '../../core/clipboard';
 import { WalletService } from '../../core/wallet.service';
 
 @Component({
@@ -17,6 +18,9 @@ export class OnboardingPage {
   protected readonly generatedKey = signal<string | null>(null);
   protected readonly keyDownloaded = signal(false);
   protected readonly importError = signal<string | null>(null);
+  protected readonly copyFeedback = signal<{ field: 'address' | 'key'; ok: boolean } | null>(
+    null,
+  );
 
   protected importInput = '';
 
@@ -25,6 +29,15 @@ export class OnboardingPage {
     this.generatedAddress.set(wallet.address);
     this.generatedKey.set(wallet.privateKey);
     this.keyDownloaded.set(false);
+  }
+
+  protected async copy(value: string | null, field: 'address' | 'key'): Promise<void> {
+    if (!value) {
+      return;
+    }
+    const ok = await copyText(value);
+    this.copyFeedback.set({ field, ok });
+    setTimeout(() => this.copyFeedback.set(null), 2500);
   }
 
   protected downloadKey(): void {
