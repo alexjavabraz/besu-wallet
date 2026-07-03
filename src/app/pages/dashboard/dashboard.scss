@@ -39,3 +39,14 @@
 .error-text {
   margin-top: 1rem;
 }
+
+.btn--error {
+  border-color: var(--erro);
+  color: var(--erro);
+}
+
+/* Vermelho escuro para manter contraste sobre os cards coloridos */
+.module--verde .error-text,
+.module--lilas .error-text {
+  color: #8c1616;
+}

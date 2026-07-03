@@ -13,10 +13,28 @@
       <button type="button" class="btn btn--dark" (click)="generate()">Gerar conta →</button>
     } @else {
       <span class="eyebrow">Endereço</span>
-      <p class="mono break value-box">{{ generatedAddress() }}</p>
+      <div class="value-row">
+        <p class="mono break value-box">{{ generatedAddress() }}</p>
+        <button type="button" class="copy-btn" (click)="copy(generatedAddress(), 'address')">
+          @if (copyFeedback()?.field === 'address') {
+            {{ copyFeedback()!.ok ? '✓ Copiado' : '✗ Falha' }}
+          } @else {
+            Copiar
+          }
+        </button>
+      </div>
 
       <span class="eyebrow">Chave privada</span>
-      <p class="mono break value-box">{{ generatedKey() }}</p>
+      <div class="value-row">
+        <p class="mono break value-box">{{ generatedKey() }}</p>
+        <button type="button" class="copy-btn" (click)="copy(generatedKey(), 'key')">
+          @if (copyFeedback()?.field === 'key') {
+            {{ copyFeedback()!.ok ? '✓ Copiado' : '✗ Falha' }}
+          } @else {
+            Copiar
+          }
+        </button>
+      </div>
 
       <p class="warning">
         Baixe a chave privada agora. Ela é a única forma de acessar esta conta quando você voltar.

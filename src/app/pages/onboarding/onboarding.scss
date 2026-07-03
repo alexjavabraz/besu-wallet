@@ -3,12 +3,39 @@
   margin-bottom: 1rem;
 }
 
+.value-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 1rem;
+}
+
 .value-box {
   background: rgba(0, 0, 0, 0.85);
   color: var(--branco);
   padding: 0.75rem 1rem;
   font-size: 0.8rem;
-  margin: 0 0 1rem;
+  margin: 0;
+  flex: 1;
+}
+
+.copy-btn {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--preto);
+  color: var(--branco);
+  border: none;
+  border-left: 1px solid var(--cinza-700);
+  padding: 0 1rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.copy-btn:hover {
+  color: var(--lima);
 }
 
 .warning {
