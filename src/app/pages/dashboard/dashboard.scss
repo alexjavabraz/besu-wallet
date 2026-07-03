@@ -1,0 +1,41 @@
+.banner {
+  border-color: var(--lima);
+  margin-bottom: 1.5rem;
+}
+
+.address {
+  font-size: 0.95rem;
+  margin: 0 0 1.25rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.balances {
+  margin: 1.5rem 0;
+}
+
+.balance {
+  font-family: var(--font-mono);
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  font-weight: 500;
+  margin: 0.25rem 0;
+  word-break: break-all;
+}
+
+.unit {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  display: block;
+}
+
+.success-text,
+.error-text {
+  margin-top: 1rem;
+}

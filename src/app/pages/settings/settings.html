@@ -1,0 +1,70 @@
+<h1 class="page-title">Configuração</h1>
+
+<section class="module">
+  <span class="eyebrow">Nó Besu · JSON-RPC</span>
+
+  <label for="rpc">Endereço do nó</label>
+  <input
+    id="rpc"
+    type="text"
+    [(ngModel)]="rpcInput"
+    placeholder="http://besu-node:8545"
+    autocomplete="off"
+    spellcheck="false"
+  />
+
+  <button type="button" class="btn" [disabled]="savingRpc()" (click)="saveRpc()">
+    {{ savingRpc() ? 'Testando...' : 'Salvar e testar →' }}
+  </button>
+
+  <div class="status">
+    @switch (networkService.status()) {
+      @case ('ok') {
+        <p class="success-text">
+          CONECTADO · CHAIN ID {{ networkService.chainId() }} · BLOCO {{ networkService.blockNumber() }}
+        </p>
+      }
+      @case ('checking') {
+        <p class="mono status-checking">VERIFICANDO CONEXÃO...</p>
+      }
+      @case ('error') {
+        <p class="error-text break">{{ networkService.error() }}</p>
+      }
+      @default {
+        <p class="mono status-idle">NENHUM NÓ CONFIGURADO</p>
+      }
+    }
+  </div>
+</section>
+
+<section class="module">
+  <span class="eyebrow">Contrato ERC-20</span>
+
+  <label for="token">Endereço do contrato</label>
+  <input
+    id="token"
+    type="text"
+    [(ngModel)]="tokenInput"
+    placeholder="0x..."
+    autocomplete="off"
+    spellcheck="false"
+  />
+
+  <button type="button" class="btn btn--lilas" [disabled]="savingToken()" (click)="saveToken()">
+    {{ savingToken() ? 'Lendo contrato...' : 'Salvar token →' }}
+  </button>
+
+  <div class="status">
+    @if (tokenSaveError()) {
+      <p class="error-text">{{ tokenSaveError() }}</p>
+    } @else if (tokenService.error()) {
+      <p class="error-text">{{ tokenService.error() }}</p>
+    } @else if (tokenService.symbol()) {
+      <p class="success-text">
+        {{ tokenService.name() }} · {{ tokenService.symbol() }} · {{ tokenService.decimals() }} DECIMAIS
+      </p>
+    } @else {
+      <p class="mono status-idle">NENHUM TOKEN CONFIGURADO</p>
+    }
+  </div>
+</section>

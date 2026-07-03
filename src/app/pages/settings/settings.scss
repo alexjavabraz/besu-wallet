@@ -1,0 +1,12 @@
+.status {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--cinza-900);
+  padding-top: 1rem;
+}
+
+.status-idle,
+.status-checking {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--cinza-300);
+}

@@ -1,1 +1,233 @@
-/* You can add global styles to this file, and also import other style files */
+/* BESU WALLET — identidade baseada no Guia da Marca Núclea */
+
+:root {
+  /* Paleta primária */
+  --preto: #000000;
+  --cinza-900: #292929;
+  --cinza-700: #3a3a3a;
+  --cinza-300: #e7e7e7;
+  --branco: #fafafa;
+
+  /* Paleta secundária */
+  --lilas: #cc90ff;
+  --lima: #dbed3f;
+  --verde: #66ffca;
+
+  /* Apoio */
+  --erro: #ff5c5c;
+
+  --font-mono: 'DM Mono', 'Tahoma', monospace;
+  --font-sans: 'DM Sans', 'Tahoma', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--preto);
+  color: var(--branco);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+/* Título de página no estilo editorial da marca */
+.page-title {
+  font-size: clamp(2rem, 6vw, 3.25rem);
+  line-height: 1.05;
+  margin: 2rem 0 2.5rem;
+}
+
+.page-title::after {
+  content: '.';
+  color: var(--lima);
+}
+
+/* Rótulo pequeno em mono caixa-alta (retranca) */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--cinza-300);
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+/* Módulo: bloco do sistema de layouts (cantos retos, sem sombra) */
+.module {
+  border: 1px solid var(--cinza-900);
+  background: var(--preto);
+  padding: 1.5rem;
+}
+
+.module + .module {
+  margin-top: 1.5rem;
+}
+
+.module--lilas {
+  background: var(--lilas);
+  border-color: var(--lilas);
+  color: var(--preto);
+}
+
+.module--lima {
+  background: var(--lima);
+  border-color: var(--lima);
+  color: var(--preto);
+}
+
+.module--verde {
+  background: var(--verde);
+  border-color: var(--verde);
+  color: var(--preto);
+}
+
+.module--lilas .eyebrow,
+.module--lima .eyebrow,
+.module--verde .eyebrow {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Botões: mono, caixa-alta, cantos retos */
+.btn {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--lima);
+  color: var(--preto);
+  border: 1px solid var(--lima);
+  padding: 0.85rem 1.5rem;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn--outline {
+  background: transparent;
+  color: var(--branco);
+  border-color: var(--branco);
+}
+
+.btn--dark {
+  background: var(--preto);
+  color: var(--branco);
+  border-color: var(--preto);
+}
+
+.btn--lilas {
+  background: var(--lilas);
+  border-color: var(--lilas);
+  color: var(--preto);
+}
+
+/* Formulários */
+label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+input,
+textarea {
+  width: 100%;
+  background: var(--preto);
+  border: 1px solid var(--cinza-700);
+  color: var(--branco);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0;
+  appearance: none;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--lima);
+}
+
+.module--lilas input,
+.module--lima input,
+.module--verde input,
+.module--lilas textarea,
+.module--lima textarea,
+.module--verde textarea {
+  background: rgba(0, 0, 0, 0.85);
+  border-color: transparent;
+}
+
+/* Utilidades */
+.mono {
+  font-family: var(--font-mono);
+}
+
+.break {
+  word-break: break-all;
+}
+
+.error-text {
+  color: var(--erro);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.success-text {
+  color: var(--verde);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.25rem 4rem;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 720px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}

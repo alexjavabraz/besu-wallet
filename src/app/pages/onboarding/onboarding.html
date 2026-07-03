@@ -1,0 +1,67 @@
+<h1 class="page-title">Acesse sua<br />carteira</h1>
+
+<div class="grid-2">
+  <section class="module module--lima">
+    <span class="eyebrow">01 · Nova conta</span>
+    <h2 class="module-title">Criar conta</h2>
+
+    @if (!generatedKey()) {
+      <p>
+        Geramos um novo par de chaves direto no seu navegador. Nada é enviado para servidor —
+        guarde a chave privada para voltar depois.
+      </p>
+      <button type="button" class="btn btn--dark" (click)="generate()">Gerar conta →</button>
+    } @else {
+      <span class="eyebrow">Endereço</span>
+      <p class="mono break value-box">{{ generatedAddress() }}</p>
+
+      <span class="eyebrow">Chave privada</span>
+      <p class="mono break value-box">{{ generatedKey() }}</p>
+
+      <p class="warning">
+        Baixe a chave privada agora. Ela é a única forma de acessar esta conta quando você voltar.
+      </p>
+
+      <div class="actions">
+        <button type="button" class="btn btn--dark" (click)="downloadKey()">
+          ↓ Baixar chave
+        </button>
+        <button type="button" class="btn btn--outline-dark" [disabled]="!keyDownloaded()" (click)="enter()">
+          Entrar na carteira →
+        </button>
+      </div>
+    }
+  </section>
+
+  <section class="module module--lilas">
+    <span class="eyebrow">02 · Já tenho conta</span>
+    <h2 class="module-title">Importar chave privada</h2>
+
+    <p>Cole a chave privada ou envie o arquivo baixado anteriormente.</p>
+
+    <label for="pk">Chave privada</label>
+    <textarea
+      id="pk"
+      rows="3"
+      [(ngModel)]="importInput"
+      placeholder="0x..."
+      autocomplete="off"
+      spellcheck="false"
+    ></textarea>
+
+    <div class="actions">
+      <button type="button" class="btn btn--dark" [disabled]="!importInput.trim()" (click)="importFromText()">
+        Importar →
+      </button>
+
+      <label class="btn btn--outline-dark file-btn">
+        ↑ Enviar arquivo
+        <input type="file" accept=".json,.txt,.key" (change)="importFromFile($event)" hidden />
+      </label>
+    </div>
+
+    @if (importError()) {
+      <p class="error-text">{{ importError() }}</p>
+    }
+  </section>
+</div>

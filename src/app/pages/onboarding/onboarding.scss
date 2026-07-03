@@ -1,0 +1,36 @@
+.module-title {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.value-box {
+  background: rgba(0, 0, 0, 0.85);
+  color: var(--branco);
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  margin: 0 0 1rem;
+}
+
+.warning {
+  font-weight: 700;
+  border-top: 1px solid rgba(0, 0, 0, 0.35);
+  padding-top: 0.75rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn--outline-dark {
+  background: transparent;
+  color: var(--preto);
+  border-color: var(--preto);
+}
+
+.file-btn {
+  cursor: pointer;
+  text-align: center;
+}

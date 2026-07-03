@@ -1,0 +1,88 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--cinza-900);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--branco);
+}
+
+.brand__mark {
+  color: var(--lima);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.brand__name {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.nav__link {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--branco);
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.nav__link:hover,
+.nav__link--active {
+  color: var(--lima);
+}
+
+.nav__exit {
+  color: var(--lilas);
+}
+
+.netbar {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  padding: 0.45rem 1.25rem;
+  background: var(--cinza-900);
+  color: var(--cinza-300);
+}
+
+.netbar--ok {
+  background: var(--verde);
+  color: var(--preto);
+}
+
+.netbar--error {
+  background: var(--erro);
+  color: var(--preto);
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1.25rem;
+  border-top: 1px solid var(--cinza-900);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  color: var(--cinza-300);
+}

@@ -1,59 +1,56 @@
-# BesuWallet
+# BESU WALLET
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.31.
+Single Page Application em Angular para interagir com um nó **Hyperledger Besu** em rede permissionada.
+Sem banco de dados e sem BFF — toda a comunicação é feita direto do navegador via JSON-RPC (ethers.js v6).
+Identidade visual baseada no Guia da Marca Núclea (DM Mono / DM Sans, preto + lilás + lima + verde).
 
-## Development server
+> Ambiente controlado de desenvolvimento, acessado apenas via VPN.
 
-To start a local development server, run:
+## Funcionalidades
 
-```bash
-ng serve
-```
+- **Gerar conta**: par de chaves criado localmente no navegador (`ethers.Wallet.createRandom`), com download da chave privada em arquivo JSON para reutilização.
+- **Importar conta**: colando a chave privada ou enviando o arquivo baixado anteriormente.
+- **Configurar nó**: endereço JSON-RPC do nó Besu (persistido em `localStorage`), com teste de conexão (chain id + bloco atual).
+- **Saldo nativo**: consulta do token nativo da rede.
+- **Token ERC-20**: configuração do endereço do contrato, leitura de nome/símbolo/decimais e consulta de saldo.
+- **Transferências**: envio do token nativo e do token ERC-20 assinados localmente com a chave importada.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+A chave privada fica apenas em `sessionStorage` (sessão do navegador) — ao fechar a aba é necessário importá-la novamente.
 
-## Code scaffolding
+## Requisitos
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Node.js >= 22
+- Navegadores-alvo: Microsoft Edge 149+ (desktop) e Chrome (mobile)
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+## Desenvolvimento
 
 ```bash
-ng build
+npm install
+npm start          # http://localhost:4200
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Build de produção
 
 ```bash
-ng test
+npm run build      # saída em dist/besu-wallet/browser
 ```
 
-## Running end-to-end tests
+O resultado é estático — pode ser servido por qualquer web server (nginx, S3, etc.).
 
-For end-to-end (e2e) testing, run:
+> **CORS**: o nó Besu precisa aceitar requisições do origin da SPA. Ex.:
+> `--rpc-http-cors-origins="*"` (ou o origin específico) na inicialização do Besu.
 
-```bash
-ng e2e
+## Estrutura
+
 ```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+src/app/
+  core/
+    network.service.ts   # provider JSON-RPC + configuração do nó
+    wallet.service.ts    # geração/importação/download da chave
+    token.service.ts     # contrato ERC-20 (metadados, saldo, transfer)
+    wallet.guard.ts      # guards de rota (com/sem carteira)
+  pages/
+    onboarding/          # /acesso  — criar ou importar conta
+    dashboard/           # /carteira — saldos e transferências
+    settings/            # /config  — nó RPC + contrato ERC-20
+```
