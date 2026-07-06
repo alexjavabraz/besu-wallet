@@ -7,7 +7,6 @@ const INJECTION_PATTERNS: RegExp[] = [
   /<[^>]+>/, // tags HTML
   /javascript:/i,
   /on\w+\s*=/i, // event handlers inline
-  /\b(drop|select|insert|update|delete|union)\b/i, // SQL keywords
   /\.\.[\/\\]/, // path traversal
   /&#x?[0-9a-f]+;/i, // entidades HTML
 ];
