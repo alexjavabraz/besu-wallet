@@ -30,6 +30,7 @@ export class OnboardingPage {
     this.generatedKey.set(wallet.privateKey);
     this.keyDownloaded.set(false);
   }
+  private copyFeedbackResetTimeout: ReturnType<typeof setTimeout> | null = null;
 
   protected async copy(value: string | null, field: 'address' | 'key'): Promise<void> {
     if (!value) {
@@ -37,7 +38,14 @@ export class OnboardingPage {
     }
     const ok = await copyText(value);
     this.copyFeedback.set({ field, ok });
-    setTimeout(() => this.copyFeedback.set(null), 2500);
+
+    if (this.copyFeedbackResetTimeout) {
+      clearTimeout(this.copyFeedbackResetTimeout);
+    }
+    this.copyFeedbackResetTimeout = setTimeout(() => {
+      this.copyFeedback.set(null);
+      this.copyFeedbackResetTimeout = null;
+    }, 2500);
   }
 
   protected downloadKey(): void {
