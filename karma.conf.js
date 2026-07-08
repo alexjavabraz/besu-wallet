@@ -7,10 +7,14 @@ module.exports = function (config) {
       require('karma-chrome-launcher'),
       require('karma-jasmine-html-reporter'),
       require('karma-coverage'),
+      require('@angular-devkit/build-angular/plugins/karma'),
     ],
     client: {
       jasmine: {},
       clearContext: false,
+    },
+    jasmineHtmlReporter: {
+      suppressAll: true,
     },
     coverageReporter: {
       dir: require('path').join(__dirname, './coverage/besu-wallet'),
@@ -25,7 +29,8 @@ module.exports = function (config) {
         flags: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
       },
     },
-    singleRun: false,
-    restartOnFileChange: true,
+    failOnEmptyTestSuite: false,
+    singleRun: true,
+    restartOnFileChange: false,
   });
 };

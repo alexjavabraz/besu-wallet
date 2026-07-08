@@ -1,28 +1,26 @@
 <h1 class="page-title">Carteira</h1>
 
-@if (!networkService.configured()) {
-  <div class="module banner">
-    <p>O endereço do nó Besu ainda não foi configurado.</p>
-    <a routerLink="/config" class="btn">Configurar nó →</a>
-  </div>
-}
+<div *ngIf="!networkService.configured" class="module banner">
+  <p>O endereço do nó Besu ainda não foi configurado.</p>
+  <a routerLink="/config" class="btn">Configurar nó →</a>
+</div>
 
 <section class="module">
   <span class="eyebrow">Sua conta</span>
-  <p class="mono break address">{{ walletService.address() }}</p>
+  <p class="mono break address">{{ walletService.address }}</p>
   <div class="actions">
-    <button type="button" class="btn btn--outline" [class.btn--error]="copyState() === 'error'" (click)="copyAddress()">
-      @switch (copyState()) {
-        @case ('ok') { Copiado ✓ }
-        @case ('error') { Falha ao copiar — selecione manualmente }
-        @default { Copiar endereço }
-      }
+    <button type="button" class="btn btn--outline" [class.btn--error]="copyState === 'error'" (click)="copyAddress()">
+      <ng-container [ngSwitch]="copyState">
+        <ng-container *ngSwitchCase="'ok'">Copiado ✓</ng-container>
+        <ng-container *ngSwitchCase="'error'">Falha ao copiar — selecione manualmente</ng-container>
+        <ng-container *ngSwitchDefault>Copiar endereço</ng-container>
+      </ng-container>
     </button>
     <button type="button" class="btn btn--outline" (click)="walletService.downloadKey()">
       ↓ Baixar chave privada
     </button>
-    <button type="button" class="btn" [disabled]="loadingBalances() || !networkService.configured()" (click)="refresh()">
-      {{ loadingBalances() ? 'Atualizando...' : 'Atualizar saldos' }}
+    <button type="button" class="btn" [disabled]="loadingBalances || !networkService.configured" (click)="refresh()">
+      {{ loadingBalances ? 'Atualizando...' : 'Atualizar saldos' }}
     </button>
   </div>
 </section>
@@ -30,25 +28,22 @@
 <div class="grid-2 balances">
   <section class="module module--verde">
     <span class="eyebrow">Token nativo</span>
-    <p class="balance">{{ loadingBalances() ? '···' : (nativeBalance() ?? '—') }}</p>
+    <p class="balance">{{ loadingBalances ? '···' : (nativeBalance ?? '—') }}</p>
     <span class="unit">SALDO EM ETH (UNIDADE NATIVA DA REDE)</span>
-    @if (nativeBalanceError()) {
-      <p class="error-text break">{{ nativeBalanceError() }}</p>
-    }
+    <p *ngIf="nativeBalanceError" class="error-text break">{{ nativeBalanceError }}</p>
   </section>
 
   <section class="module module--lilas">
-    <span class="eyebrow">Token ERC-20 {{ tokenService.symbol() ? '· ' + tokenService.symbol() : '' }}</span>
-    @if (tokenService.configured()) {
-      <p class="balance">{{ loadingBalances() ? '···' : (tokenBalance() ?? '—') }}</p>
-      <span class="unit break">{{ tokenService.name() ?? tokenService.tokenAddress() }}</span>
-      @if (tokenBalanceError()) {
-        <p class="error-text break">{{ tokenBalanceError() }}</p>
-      }
-    } @else {
+    <span class="eyebrow">Token ERC-20 {{ tokenService.symbol ? '· ' + tokenService.symbol : '' }}</span>
+    <ng-container *ngIf="tokenService.configured; else noToken">
+      <p class="balance">{{ loadingBalances ? '···' : (tokenBalance ?? '—') }}</p>
+      <span class="unit break">{{ tokenService.name ?? tokenService.tokenAddress }}</span>
+      <p *ngIf="tokenBalanceError" class="error-text break">{{ tokenBalanceError }}</p>
+    </ng-container>
+    <ng-template #noToken>
       <p>Nenhum contrato ERC-20 configurado.</p>
       <a routerLink="/config" class="btn btn--dark">Configurar token →</a>
-    }
+    </ng-template>
   </section>
 </div>
 
@@ -62,40 +57,33 @@
     <label for="native-amount">Valor</label>
     <input id="native-amount" type="text" inputmode="decimal" [(ngModel)]="nativeAmount" placeholder="0.0" autocomplete="off" />
 
-    <button type="button" class="btn" [disabled]="nativeTx().sending" (click)="sendNative()">
-      {{ nativeTx().sending ? 'Enviando...' : 'Enviar →' }}
+    <button type="button" class="btn" [disabled]="nativeTx.sending" (click)="sendNative()">
+      {{ nativeTx.sending ? 'Enviando...' : 'Enviar →' }}
     </button>
 
-    @if (nativeTx().hash) {
-      <p class="success-text break">TX CONFIRMADA · {{ nativeTx().hash }}</p>
-    }
-    @if (nativeTx().error) {
-      <p class="error-text break">{{ nativeTx().error }}</p>
-    }
+    <p *ngIf="nativeTx.hash" class="success-text break">TX CONFIRMADA · {{ nativeTx.hash }}</p>
+    <p *ngIf="nativeTx.error" class="error-text break">{{ nativeTx.error }}</p>
   </section>
 
   <section class="module">
-    <span class="eyebrow">Transferir · {{ tokenService.symbol() ?? 'ERC-20' }}</span>
+    <span class="eyebrow">Transferir · {{ tokenService.symbol ?? 'ERC-20' }}</span>
 
-    @if (tokenService.configured()) {
+    <ng-container *ngIf="tokenService.configured; else noTokenTransfer">
       <label for="token-to">Destino</label>
       <input id="token-to" type="text" [(ngModel)]="tokenTo" placeholder="0x..." autocomplete="off" spellcheck="false" />
 
       <label for="token-amount">Valor</label>
       <input id="token-amount" type="text" inputmode="decimal" [(ngModel)]="tokenAmount" placeholder="0.0" autocomplete="off" />
 
-      <button type="button" class="btn btn--lilas" [disabled]="tokenTx().sending" (click)="sendToken()">
-        {{ tokenTx().sending ? 'Enviando...' : 'Enviar →' }}
+      <button type="button" class="btn btn--lilas" [disabled]="tokenTx.sending" (click)="sendToken()">
+        {{ tokenTx.sending ? 'Enviando...' : 'Enviar →' }}
       </button>
 
-      @if (tokenTx().hash) {
-        <p class="success-text break">TX CONFIRMADA · {{ tokenTx().hash }}</p>
-      }
-      @if (tokenTx().error) {
-        <p class="error-text break">{{ tokenTx().error }}</p>
-      }
-    } @else {
+      <p *ngIf="tokenTx.hash" class="success-text break">TX CONFIRMADA · {{ tokenTx.hash }}</p>
+      <p *ngIf="tokenTx.error" class="error-text break">{{ tokenTx.error }}</p>
+    </ng-container>
+    <ng-template #noTokenTransfer>
       <p>Configure o contrato ERC-20 para transferir tokens.</p>
-    }
+    </ng-template>
   </section>
 </div>

@@ -1,13 +1,15 @@
 import { Component, inject } from '@angular/core';
+import { NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { NetworkService } from './core/network.service';
 import { WalletService } from './core/wallet.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault],
   templateUrl: './app.html',
-  styleUrl: './app.scss',
+  styleUrls: ['./app.scss'],
 })
 export class App {
   protected readonly walletService = inject(WalletService);

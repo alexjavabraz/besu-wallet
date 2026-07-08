@@ -5,36 +5,32 @@
   </a>
 
   <nav class="nav">
-    @if (walletService.hasWallet()) {
-      <a routerLink="/carteira" routerLinkActive="nav__link--active" class="nav__link">Carteira</a>
-    }
+    <a *ngIf="walletService.hasWallet" routerLink="/carteira" routerLinkActive="nav__link--active" class="nav__link">Carteira</a>
     <a routerLink="/config" routerLinkActive="nav__link--active" class="nav__link">Config</a>
-    @if (walletService.hasWallet()) {
-      <button type="button" class="nav__link nav__exit" (click)="exit()">Sair</button>
-    }
+    <button *ngIf="walletService.hasWallet" type="button" class="nav__link nav__exit" (click)="exit()">Sair</button>
   </nav>
 </header>
 
-<div class="netbar" [class.netbar--ok]="networkService.status() === 'ok'"
-     [class.netbar--error]="networkService.status() === 'error'">
-  @switch (networkService.status()) {
-    @case ('ok') {
-      NÓ CONECTADO · CHAIN {{ networkService.chainId() }} · BLOCO {{ networkService.blockNumber() }}
-    }
-    @case ('checking') {
+<div class="netbar" [class.netbar--ok]="networkService.status === 'ok'"
+     [class.netbar--error]="networkService.status === 'error'">
+  <ng-container [ngSwitch]="networkService.status">
+    <ng-container *ngSwitchCase="'ok'">
+      NÓ CONECTADO · CHAIN {{ networkService.chainId }} · BLOCO {{ networkService.blockNumber }}
+    </ng-container>
+    <ng-container *ngSwitchCase="'checking'">
       CONECTANDO AO NÓ...
-    }
-    @case ('error') {
+    </ng-container>
+    <ng-container *ngSwitchCase="'error'">
       FALHA AO CONECTAR AO NÓ — VERIFIQUE A CONFIGURAÇÃO
-    }
-    @default {
+    </ng-container>
+    <ng-container *ngSwitchDefault>
       NÓ NÃO CONFIGURADO — ACESSE CONFIG
-    }
-  }
+    </ng-container>
+  </ng-container>
 </div>
 
 <main class="container">
-  <router-outlet />
+  <router-outlet></router-outlet>
 </main>
 
 <footer class="footer">

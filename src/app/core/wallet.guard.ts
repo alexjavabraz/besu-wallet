@@ -5,11 +5,11 @@ import { WalletService } from './wallet.service';
 export const walletGuard: CanActivateFn = () => {
   const walletService = inject(WalletService);
   const router = inject(Router);
-  return walletService.hasWallet() ? true : router.createUrlTree(['/acesso']);
+  return walletService.hasWallet ? true : router.createUrlTree(['/acesso']);
 };
 
 export const noWalletGuard: CanActivateFn = () => {
   const walletService = inject(WalletService);
   const router = inject(Router);
-  return walletService.hasWallet() ? router.createUrlTree(['/carteira']) : true;
+  return walletService.hasWallet ? router.createUrlTree(['/carteira']) : true;
 };

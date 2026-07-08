@@ -5,34 +5,34 @@
     <span class="eyebrow">01 · Nova conta</span>
     <h2 class="module-title">Criar conta</h2>
 
-    @if (!generatedKey()) {
+    <ng-container *ngIf="!generatedKey; else generatedBlock">
       <p>
         Geramos um novo par de chaves direto no seu navegador. Nada é enviado para servidor —
         guarde a chave privada para voltar depois.
       </p>
       <button type="button" class="btn btn--dark" (click)="generate()">Gerar conta →</button>
-    } @else {
+    </ng-container>
+
+    <ng-template #generatedBlock>
       <span class="eyebrow">Endereço</span>
       <div class="value-row">
-        <p class="mono break value-box">{{ generatedAddress() }}</p>
-        <button type="button" class="copy-btn" (click)="copy(generatedAddress(), 'address')">
-          @if (copyFeedback()?.field === 'address') {
-            {{ copyFeedback()!.ok ? '✓ Copiado' : '✗ Falha' }}
-          } @else {
-            Copiar
-          }
+        <p class="mono break value-box">{{ generatedAddress }}</p>
+        <button type="button" class="copy-btn" (click)="copy(generatedAddress, 'address')">
+          <ng-container *ngIf="copyFeedback?.field === 'address'; else copyAddressDefault">
+            {{ copyFeedback!.ok ? '✓ Copiado' : '✗ Falha' }}
+          </ng-container>
+          <ng-template #copyAddressDefault>Copiar</ng-template>
         </button>
       </div>
 
       <span class="eyebrow">Chave privada</span>
       <div class="value-row">
-        <p class="mono break value-box">{{ generatedKey() }}</p>
-        <button type="button" class="copy-btn" (click)="copy(generatedKey(), 'key')">
-          @if (copyFeedback()?.field === 'key') {
-            {{ copyFeedback()!.ok ? '✓ Copiado' : '✗ Falha' }}
-          } @else {
-            Copiar
-          }
+        <p class="mono break value-box">{{ generatedKey }}</p>
+        <button type="button" class="copy-btn" (click)="copy(generatedKey, 'key')">
+          <ng-container *ngIf="copyFeedback?.field === 'key'; else copyKeyDefault">
+            {{ copyFeedback!.ok ? '✓ Copiado' : '✗ Falha' }}
+          </ng-container>
+          <ng-template #copyKeyDefault>Copiar</ng-template>
         </button>
       </div>
 
@@ -44,11 +44,11 @@
         <button type="button" class="btn btn--dark" (click)="downloadKey()">
           ↓ Baixar chave
         </button>
-        <button type="button" class="btn btn--outline-dark" [disabled]="!keyDownloaded()" (click)="enter()">
+        <button type="button" class="btn btn--outline-dark" [disabled]="!keyDownloaded" (click)="enter()">
           Entrar na carteira →
         </button>
       </div>
-    }
+    </ng-template>
   </section>
 
   <section class="module module--lilas">
@@ -78,8 +78,6 @@
       </label>
     </div>
 
-    @if (importError()) {
-      <p class="error-text">{{ importError() }}</p>
-    }
+    <p *ngIf="importError" class="error-text">{{ importError }}</p>
   </section>
 </div>

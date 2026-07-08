@@ -1,21 +1,19 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Wallet } from 'ethers';
 
 const PK_KEY = 'besu.wallet.pk';
 
 @Injectable({ providedIn: 'root' })
 export class WalletService {
-  private readonly _wallet = signal<Wallet | null>(this.restore());
+  private _wallet: Wallet | null = this.restore();
 
-  readonly wallet = this._wallet.asReadonly();
-  readonly address = computed(() => this._wallet()?.address ?? null);
-  readonly hasWallet = computed(() => this._wallet() !== null);
+  get wallet(): Wallet | null { return this._wallet; }
+  get address(): string | null { return this._wallet?.address ?? null; }
+  get hasWallet(): boolean { return this._wallet !== null; }
 
   private restore(): Wallet | null {
     const pk = sessionStorage.getItem(PK_KEY);
-    if (!pk) {
-      return null;
-    }
+    if (!pk) return null;
     try {
       return new Wallet(pk);
     } catch {
@@ -36,24 +34,19 @@ export class WalletService {
   private load(privateKey: string): Wallet {
     const wallet = new Wallet(privateKey);
     sessionStorage.setItem(PK_KEY, wallet.privateKey);
-    this._wallet.set(wallet);
+    this._wallet = wallet;
     return wallet;
   }
 
-  /** Aceita a chave pura (com ou sem 0x) ou o conteúdo do arquivo JSON baixado. */
   private extractPrivateKey(input: string): string {
     const match = input.match(/(0x)?[0-9a-fA-F]{64}/);
-    if (!match) {
-      throw new Error('Nenhuma chave privada válida encontrada');
-    }
+    if (!match) throw new Error('Nenhuma chave privada válida encontrada');
     return match[0].startsWith('0x') ? match[0] : `0x${match[0]}`;
   }
 
   downloadKey(): void {
-    const wallet = this._wallet();
-    if (!wallet) {
-      return;
-    }
+    const wallet = this._wallet;
+    if (!wallet) return;
     const content = JSON.stringify(
       {
         address: wallet.address,
@@ -74,6 +67,6 @@ export class WalletService {
 
   disconnect(): void {
     sessionStorage.removeItem(PK_KEY);
-    this._wallet.set(null);
+    this._wallet = null;
   }
 }
