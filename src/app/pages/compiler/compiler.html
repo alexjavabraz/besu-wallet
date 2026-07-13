@@ -1,0 +1,95 @@
+<h1 class="page-title">Compilador Solidity</h1>
+
+<div *ngIf="loadingSolc" class="module banner">
+  <p class="mono">Carregando compilador Solidity...</p>
+</div>
+
+<section class="module">
+  <span class="eyebrow">Código-fonte</span>
+  <textarea
+    [(ngModel)]="sourceCode"
+    rows="20"
+    placeholder="// SPDX-License-Identifier: MIT&#10;pragma solidity ^0.8.0;&#10;&#10;contract MeuContrato { }"
+    spellcheck="false"
+    class="code-editor"
+  ></textarea>
+
+  <button
+    type="button"
+    class="btn"
+    [disabled]="!sourceCode.trim() || compiling || loadingSolc"
+    (click)="compile()"
+  >
+    {{ compiling ? 'Compilando...' : 'Compilar →' }}
+  </button>
+</section>
+
+<!-- Erros de compilação -->
+<section *ngIf="compileErrors.length > 0" class="module">
+  <span class="eyebrow">Erros de compilação</span>
+  <pre *ngFor="let err of compileErrors" class="error-text compile-errors">{{ err.formattedMessage }}</pre>
+</section>
+
+<!-- Resultado da compilação -->
+<section *ngIf="compiledContracts.length > 0" class="module module--verde">
+  <span class="eyebrow">Compilação bem-sucedida · {{ compiledContracts.length }} contrato(s)</span>
+
+  <ng-container *ngIf="compiledContracts.length > 1">
+    <label for="contract-select">Contrato para implantar</label>
+    <select id="contract-select" [(ngModel)]="selectedContractName">
+      <option *ngFor="let c of compiledContracts" [value]="c.name">{{ c.name }}</option>
+    </select>
+  </ng-container>
+
+  <ng-container *ngIf="selectedContract">
+    <p class="mono status-idle">
+      {{ selectedContract.name }} · {{ selectedContract.abi.length }} entradas na ABI ·
+      bytecode {{ selectedContract.bytecode.length / 2 }} bytes
+    </p>
+
+    <ng-container *ngIf="hasConstructorArgs">
+      <label for="ctor-args">
+        Argumentos do construtor
+        <span class="eyebrow">({{ constructorInputs | json }})</span>
+      </label>
+      <input
+        id="ctor-args"
+        type="text"
+        [(ngModel)]="constructorArgsInput"
+        placeholder='["argumento", 123]'
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <p *ngIf="constructorArgsError" class="error-text">{{ constructorArgsError }}</p>
+    </ng-container>
+
+    <p *ngIf="!networkService.configured" class="error-text">
+      Configure o nó Besu antes de implantar. <a routerLink="/config">→ Ir às configurações</a>
+    </p>
+    <p *ngIf="networkService.configured && !walletService.hasWallet" class="error-text">
+      Configure uma conta antes de implantar. <a routerLink="/acesso">→ Ir ao acesso</a>
+    </p>
+
+    <button
+      *ngIf="networkService.configured && walletService.hasWallet"
+      type="button"
+      class="btn"
+      [disabled]="deploying"
+      (click)="deploy()"
+    >
+      {{ deploying ? 'Implantando...' : 'Implantar na rede →' }}
+    </button>
+  </ng-container>
+</section>
+
+<!-- Resultado do deploy -->
+<section *ngIf="deployedAddress" class="module module--verde">
+  <span class="eyebrow">Contrato implantado com sucesso</span>
+  <p class="mono break address">{{ deployedAddress }}</p>
+  <p *ngIf="deployedTxHash" class="mono break">TX: {{ deployedTxHash }}</p>
+  <a routerLink="/contratos" class="btn btn--outline">Ver contratos implantados →</a>
+</section>
+
+<section *ngIf="deployError" class="module">
+  <p class="error-text break">{{ deployError }}</p>
+</section>

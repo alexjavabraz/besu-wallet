@@ -1,0 +1,50 @@
+.contract-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.contract-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.contract-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.contract-meta {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin: 0.25rem 0 0;
+}
+
+.contract-tx {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  margin: 0;
+}
+
+.contract-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn--danger {
+  border-color: var(--color-error, #e05);
+  color: var(--color-error, #e05);
+}
+
+.abi-view {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

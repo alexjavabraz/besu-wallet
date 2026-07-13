@@ -1,0 +1,41 @@
+<h1 class="page-title">Contratos Implantados</h1>
+
+<div *ngIf="contracts.length === 0" class="module banner">
+  <p>Nenhum contrato implantado ainda.</p>
+  <a routerLink="/compilador" class="btn">Ir ao Compilador →</a>
+</div>
+
+<div *ngFor="let contract of contracts" class="module contract-card">
+  <div class="contract-header">
+    <div class="contract-info">
+      <span class="eyebrow">{{ contract.name }}</span>
+      <p class="mono break address">{{ contract.address }}</p>
+      <p class="contract-meta">
+        Chain {{ contract.chainId }} ·
+        {{ contract.deployedAt | date:'dd/MM/yyyy HH:mm' }}
+      </p>
+    </div>
+    <button
+      type="button"
+      class="btn btn--outline copy-btn"
+      (click)="copyAddress(contract)"
+    >
+      {{ copiedId === contract.id ? 'Copiado ✓' : 'Copiar endereço' }}
+    </button>
+  </div>
+
+  <p *ngIf="contract.txHash" class="mono break contract-tx">
+    TX: {{ contract.txHash }}
+  </p>
+
+  <div class="contract-actions">
+    <button type="button" class="btn btn--outline" (click)="toggleAbi(contract.id)">
+      {{ expandedAbi === contract.id ? 'Ocultar ABI' : 'Ver ABI (' + contract.abi.length + ' entradas)' }}
+    </button>
+    <button type="button" class="btn btn--outline btn--danger" (click)="deleteContract(contract.id)">
+      Remover
+    </button>
+  </div>
+
+  <pre *ngIf="expandedAbi === contract.id" class="abi-view">{{ contract.abi | json }}</pre>
+</div>

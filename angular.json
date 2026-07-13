@@ -50,6 +50,11 @@
                 "glob": "**/*",
                 "input": "public",
                 "output": "/"
+              },
+              {
+                "glob": "soljson.js",
+                "input": "node_modules/solc",
+                "output": "/"
               }
             ],
             "styles": [

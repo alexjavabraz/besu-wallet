@@ -1,0 +1,13 @@
+.code-editor {
+  width: 100%;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  resize: vertical;
+  min-height: 300px;
+}
+
+.compile-errors {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.8rem;
+}

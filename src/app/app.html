@@ -6,6 +6,8 @@
 
   <nav class="nav">
     <a *ngIf="walletService.hasWallet" routerLink="/carteira" routerLinkActive="nav__link--active" class="nav__link">Carteira</a>
+    <a *ngIf="walletService.hasWallet" routerLink="/compilador" routerLinkActive="nav__link--active" class="nav__link">Compilador</a>
+    <a routerLink="/contratos" routerLinkActive="nav__link--active" class="nav__link">Contratos</a>
     <a routerLink="/config" routerLinkActive="nav__link--active" class="nav__link">Config</a>
     <button *ngIf="walletService.hasWallet" type="button" class="nav__link nav__exit" (click)="exit()">Sair</button>
   </nav>
