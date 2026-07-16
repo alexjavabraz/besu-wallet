@@ -134,26 +134,39 @@ export class ContractService {
     const factory = new ContractFactory(contract.abi, contract.bytecode, signer);
 
     const deployTx = await factory.getDeployTransaction(...constructorArgs);
+    const latestBlock = await this.network.provider.getBlock('latest');
 
     // Simula a implantação via eth_call antes de gastar uma transação real.
     // Isso faz o ethers decodificar o motivo verdadeiro de uma reversão (ex.:
     // require/overflow no construtor) — informação que o recibo de uma
-    // transação minerada e revertida não traz (reason=null).
+    // transação minerada e revertida não traz (reason=null). Passamos o
+    // gasLimit do bloco explicitamente: sem isso, o nó usa seu próprio teto
+    // padrão para eth_call, que pode ser baixo demais e mascarar o motivo
+    // real atrás de um "missing revert data".
     try {
-      await this.network.provider.call({ ...deployTx, from: signer.address });
+      await this.network.provider.call({
+        ...deployTx,
+        from: signer.address,
+        gasLimit: latestBlock?.gasLimit,
+      });
     } catch (e: any) {
-      const reason = e?.reason || e?.shortMessage || e?.info?.error?.message;
-      throw new Error(reason ? `Construtor reverteu: ${reason}` : 'Construtor reverteu ao simular a implantação (verifique os argumentos).');
+      const reason =
+        e?.reason ||
+        e?.info?.error?.message ||
+        e?.error?.message ||
+        e?.shortMessage;
+      const detail = reason ? `: ${reason}` : ` — detalhe bruto: ${JSON.stringify(e)?.slice(0, 300)}`;
+      throw new Error(`Construtor reverteu ao simular a implantação${detail}`);
     }
 
     // O gasLimit ideal varia por rede (bloco público com teto baixo como
     // Rootstock vs. rede Besu permissionada que pode exigir mais gas do que o
     // usual). Estimamos o custo real via o próprio nó e damos uma margem de
     // segurança, sem nunca ultrapassar o limite do bloco atual.
-    const [estimatedGas, latestBlock] = await Promise.all([
-      this.network.provider.estimateGas({ ...deployTx, from: signer.address }),
-      this.network.provider.getBlock('latest'),
-    ]);
+    const estimatedGas = await this.network.provider.estimateGas({
+      ...deployTx,
+      from: signer.address,
+    });
 
     const bufferedGas = (estimatedGas * 120n) / 100n;
     const blockGasLimit = latestBlock?.gasLimit;
