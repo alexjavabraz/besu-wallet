@@ -133,9 +133,21 @@ export class ContractService {
     const signer = this.wallet.wallet!.connect(this.network.provider);
     const factory = new ContractFactory(contract.abi, contract.bytecode, signer);
 
-    const deployed = await factory.deploy(...constructorArgs, {
-      gasLimit: 10_000_000n,
-    });
+    // O gasLimit ideal varia por rede (bloco público com teto baixo como
+    // Rootstock vs. rede Besu permissionada que pode exigir mais gas do que o
+    // usual). Estimamos o custo real via o próprio nó e damos uma margem de
+    // segurança, sem nunca ultrapassar o limite do bloco atual.
+    const deployTx = await factory.getDeployTransaction(...constructorArgs);
+    const [estimatedGas, latestBlock] = await Promise.all([
+      this.network.provider.estimateGas({ ...deployTx, from: signer.address }),
+      this.network.provider.getBlock('latest'),
+    ]);
+
+    const bufferedGas = (estimatedGas * 120n) / 100n;
+    const blockGasLimit = latestBlock?.gasLimit;
+    const gasLimit = blockGasLimit && bufferedGas > blockGasLimit ? blockGasLimit : bufferedGas;
+
+    const deployed = await factory.deploy(...constructorArgs, { gasLimit });
 
     const receipt = await deployed.deploymentTransaction()?.wait();
     const address = await deployed.getAddress();
