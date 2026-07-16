@@ -5,6 +5,16 @@
 </div>
 
 <section class="module">
+  <label for="erc-template">Padrão ERC (opcional)</label>
+  <select
+    id="erc-template"
+    [(ngModel)]="selectedTemplate"
+    (ngModelChange)="onTemplateChange($event)"
+  >
+    <option value="">Personalizado</option>
+    <option *ngFor="let t of ercTemplates | keyvalue" [value]="t.key">{{ t.value.label }}</option>
+  </select>
+
   <span class="eyebrow">Código-fonte</span>
   <textarea
     [(ngModel)]="sourceCode"
@@ -36,7 +46,11 @@
 
   <ng-container *ngIf="compiledContracts.length > 1">
     <label for="contract-select">Contrato para implantar</label>
-    <select id="contract-select" [(ngModel)]="selectedContractName">
+    <select
+      id="contract-select"
+      [ngModel]="selectedContractName"
+      (ngModelChange)="onContractSelect($event)"
+    >
       <option *ngFor="let c of compiledContracts" [value]="c.name">{{ c.name }}</option>
     </select>
   </ng-container>
@@ -48,18 +62,20 @@
     </p>
 
     <ng-container *ngIf="hasConstructorArgs">
-      <label for="ctor-args">
-        Argumentos do construtor
-        <span class="eyebrow">({{ constructorInputs | json }})</span>
-      </label>
-      <input
-        id="ctor-args"
-        type="text"
-        [(ngModel)]="constructorArgsInput"
-        placeholder='["argumento", 123]'
-        autocomplete="off"
-        spellcheck="false"
-      />
+      <span class="eyebrow">Argumentos do construtor</span>
+      <div *ngFor="let input of constructorInputs; let i = index" class="ctor-field">
+        <label [for]="'ctor-arg-' + i">
+          {{ input.name || ('arg' + i) }} <span class="eyebrow">({{ input.type }})</span>
+        </label>
+        <input
+          [id]="'ctor-arg-' + i"
+          type="text"
+          [(ngModel)]="constructorArgValues[i]"
+          [placeholder]="argPlaceholder(input.type)"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
       <p *ngIf="constructorArgsError" class="error-text">{{ constructorArgsError }}</p>
     </ng-container>
 

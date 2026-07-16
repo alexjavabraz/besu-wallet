@@ -34,45 +34,73 @@ export class ContractService {
   private readonly network = inject(NetworkService);
   private readonly wallet = inject(WalletService);
 
-  private solcModule: any = null;
+  private solcWorker: Worker | null = null;
+  private readonly pendingCompiles = new Map<
+    number,
+    { resolve: (output: string) => void; reject: (err: Error) => void }
+  >();
+  private nextCompileId = 0;
 
   // ---- Compilação ----
+  // O compilador Solidity (soljson.js) tem um binário WebAssembly maior que 8MB.
+  // Navegadores baseados em Chromium proíbem WebAssembly.Compile síncrono na main
+  // thread acima desse limite, então a compilação roda em uma Web Worker.
 
-  loadSolc(): Promise<any> {
-    if (this.solcModule) return Promise.resolve(this.solcModule);
+  private getSolcWorker(): Worker {
+    if (this.solcWorker) return this.solcWorker;
 
-    return new Promise<any>((resolve, reject) => {
-      const win = window as any;
-      if (win._besuSolc?.cwrap) {
-        this.solcModule = win._besuSolc;
-        resolve(this.solcModule);
-        return;
+    const worker = new Worker('solc.worker.js');
+    worker.onmessage = (event: MessageEvent) => {
+      const { id, output, error } = event.data;
+      const job = this.pendingCompiles.get(id);
+      if (!job) return;
+      this.pendingCompiles.delete(id);
+      if (error) {
+        job.reject(new Error(error));
+      } else {
+        job.resolve(output);
       }
-      win.Module = {
-        onRuntimeInitialized: () => {
-          this.solcModule = win.Module;
-          win._besuSolc = win.Module;
-          resolve(this.solcModule);
-        },
-      };
-      const script = document.createElement('script');
-      script.src = 'soljson.js';
-      script.onerror = () => reject(new Error('Falha ao carregar o compilador Solidity'));
-      document.head.appendChild(script);
+    };
+    worker.onerror = () => {
+      this.pendingCompiles.forEach((job) =>
+        job.reject(new Error('Falha ao carregar o compilador Solidity')),
+      );
+      this.pendingCompiles.clear();
+    };
+
+    this.solcWorker = worker;
+    return worker;
+  }
+
+  private runSolcCompile(input: string): Promise<string> {
+    const worker = this.getSolcWorker();
+    const id = this.nextCompileId++;
+
+    return new Promise<string>((resolve, reject) => {
+      this.pendingCompiles.set(id, { resolve, reject });
+      worker.postMessage({ id, input });
+    });
+  }
+
+  /** Pré-carrega o compilador na worker (usado para mostrar um spinner de carregamento). */
+  loadSolc(): Promise<void> {
+    const worker = this.getSolcWorker();
+    const id = this.nextCompileId++;
+
+    return new Promise<void>((resolve, reject) => {
+      this.pendingCompiles.set(id, { resolve: () => resolve(), reject });
+      worker.postMessage({ id, warmup: true });
     });
   }
 
   async compile(source: string): Promise<{ contracts: CompiledContract[]; errors: CompileError[] }> {
-    const Module = await this.loadSolc();
-
     const input = JSON.stringify({
       language: 'Solidity',
       sources: { 'contract.sol': { content: source } },
       settings: { outputSelection: { '*': { '*': ['abi', 'evm.bytecode'] } } },
     });
 
-    const compileFunc = Module.cwrap('solidity_compile', 'string', ['string', 'number']);
-    const output = JSON.parse(compileFunc(input, 0));
+    const output = JSON.parse(await this.runSolcCompile(input));
 
     const errors: CompileError[] = (output.errors ?? []).filter(
       (e: any) => e.severity === 'error',
@@ -106,7 +134,6 @@ export class ContractService {
     const factory = new ContractFactory(contract.abi, contract.bytecode, signer);
 
     const deployed = await factory.deploy(...constructorArgs, {
-      gasPrice: 0n,
       gasLimit: 10_000_000n,
     });
 
