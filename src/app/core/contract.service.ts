@@ -133,11 +133,23 @@ export class ContractService {
     const signer = this.wallet.wallet!.connect(this.network.provider);
     const factory = new ContractFactory(contract.abi, contract.bytecode, signer);
 
+    const deployTx = await factory.getDeployTransaction(...constructorArgs);
+
+    // Simula a implantação via eth_call antes de gastar uma transação real.
+    // Isso faz o ethers decodificar o motivo verdadeiro de uma reversão (ex.:
+    // require/overflow no construtor) — informação que o recibo de uma
+    // transação minerada e revertida não traz (reason=null).
+    try {
+      await this.network.provider.call({ ...deployTx, from: signer.address });
+    } catch (e: any) {
+      const reason = e?.reason || e?.shortMessage || e?.info?.error?.message;
+      throw new Error(reason ? `Construtor reverteu: ${reason}` : 'Construtor reverteu ao simular a implantação (verifique os argumentos).');
+    }
+
     // O gasLimit ideal varia por rede (bloco público com teto baixo como
     // Rootstock vs. rede Besu permissionada que pode exigir mais gas do que o
     // usual). Estimamos o custo real via o próprio nó e damos uma margem de
     // segurança, sem nunca ultrapassar o limite do bloco atual.
-    const deployTx = await factory.getDeployTransaction(...constructorArgs);
     const [estimatedGas, latestBlock] = await Promise.all([
       this.network.provider.estimateGas({ ...deployTx, from: signer.address }),
       this.network.provider.getBlock('latest'),
